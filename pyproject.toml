@@ -1,0 +1,20 @@
+[project]
+name = "activity-log-mcp"
+version = "0.1.0"
+description = "MCP server for structured activity logging workflows."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0.0",
+    "fastmcp>=0.1.0",
+]
+
+[project.scripts]
+activity-log-mcp = "activity_log_mcp.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = ["pytest>=8.0.0"]
