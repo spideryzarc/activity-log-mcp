@@ -2,7 +2,10 @@
 
 An MCP (Model Context Protocol) server for activity logging workflows used by autonomous agents.
 
-This project replaces script-based logging automation with MCP tools while preserving behavioral parity for:
+The primary goal of this MCP is to provide a tool for agents to register changes made in a codebase without spending excessive tokens.
+This structured log is useful as a reliable source for generating future reports.
+
+It provides tools to:
 - append new entries
 - update last entry
 - dump entries (optionally filtered by date)
@@ -10,7 +13,6 @@ This project replaces script-based logging automation with MCP tools while prese
 
 ## Features
 
-- Parity with the original `log-activity` workflow semantics.
 - Local file persistence at `activity-log/activity_log.json`.
 - Automatic directory creation for write operations.
 - Corrupt JSON backup to `.bak` before recovering.
@@ -58,12 +60,51 @@ Add to the `~/.config/Code/User/settings.json` (on Linux/macOS) or `%APPDATA%\Co
 }
 ```
 
+## Recommended IDE Rule
+
+To ensure consistency, advise users to create a fixed IDE rule/instruction so agents always log tasks with this MCP.
+
+Example rule:
+
+```text
+Whenever you complete a relevant coding, refactoring, or documentation task,
+log the activity using the activity-log-mcp MCP.
+Include a short description and the list of modified files.
+If the task is a continuation of a previous one, update the last entry instead of creating a new one.
+```
+
+This reduces context loss, avoids unnecessary token usage to reconstruct history, and improves future report generation.
+
 ## Exposed MCP Tools
 
 - `log_activity`
 - `update_last_activity`
 - `dump_activity_log`
 - `rotate_activity_log`
+
+## JSON Log Example
+
+Example `activity-log/activity_log.json` file with two entries:
+
+```json
+[
+    {
+        "timestamp": "2026-05-16T10:12:31Z",
+        "description": "Initialized the MCP server locally",
+        "files": [
+            "src/activity_log_mcp/main.py",
+            "src/activity_log_mcp/server.py"
+        ]
+    },
+    {
+        "timestamp": "2026-05-16T10:24:05Z",
+        "description": "Added test for update_last_activity",
+        "files": [
+            "tests/test_server.py"
+        ]
+    }
+]
+```
 
 ## Local Development
 
@@ -85,4 +126,4 @@ uv run pytest
 - `pyproject.toml`: package metadata, dependencies, and entrypoint.
 - `src/activity_log_mcp/main.py`: server entrypoint.
 - `src/activity_log_mcp/server.py`: MCP instance and tool implementations.
-- `tests/test_server.py`: pytest coverage for parity behaviors.
+- `tests/test_server.py`: pytest coverage for logging behaviors.
