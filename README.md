@@ -89,19 +89,25 @@ Example `activity-log/activity_log.json` file with two entries:
 ```json
 [
     {
-        "timestamp": "2026-05-16T10:12:31Z",
-        "description": "Initialized the MCP server locally",
-        "files": [
+        "date": "2026-05-16T10:12:31",
+        "objective": "Initialize local MCP server",
+        "result": "Initialized the MCP server locally",
+        "changed_files": [
             "src/activity_log_mcp/main.py",
             "src/activity_log_mcp/server.py"
-        ]
+        ],
+        "status": "success",
+        "notes": ""
     },
     {
-        "timestamp": "2026-05-16T10:24:05Z",
-        "description": "Added test for update_last_activity",
-        "files": [
+        "date": "2026-05-16T10:24:05",
+        "objective": "Add test for update_last_activity",
+        "result": "Added test for update_last_activity",
+        "changed_files": [
             "tests/test_server.py"
-        ]
+        ],
+        "status": "success",
+        "notes": ""
     }
 ]
 ```

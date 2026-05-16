@@ -81,6 +81,17 @@ def _month_key(date_value: str) -> str:
     return "unknown"
 
 
+def _parse_entry_date(date_value: str) -> datetime.date | None:
+    normalized = date_value.strip()
+    if normalized.endswith("Z"):
+        normalized = normalized[:-1] + "+00:00"
+
+    try:
+        return datetime.fromisoformat(normalized).date()
+    except ValueError:
+        return None
+
+
 @mcp.resource("context://activity-log/manifesto")
 def activity_log_manifesto() -> str:
     """Provides MCP usage guidance for activity logging workflows."""
@@ -184,7 +195,7 @@ def dump_activity_log(since: str | None = None, cwd: str | None = None) -> str:
     result_entries = entries
     if since:
         try:
-            since_date = datetime.strptime(since, "%Y-%m-%d")
+            since_date = datetime.strptime(since, "%Y-%m-%d").date()
         except ValueError:
             return f"Invalid date format for --since: {since}. Use YYYY-MM-DD."
 
@@ -193,9 +204,8 @@ def dump_activity_log(since: str | None = None, cwd: str | None = None) -> str:
             date_value = entry.get("date")
             if not isinstance(date_value, str):
                 continue
-            try:
-                entry_date = datetime.fromisoformat(date_value)
-            except ValueError:
+            entry_date = _parse_entry_date(date_value)
+            if entry_date is None:
                 continue
             if entry_date >= since_date:
                 filtered_entries.append(entry)

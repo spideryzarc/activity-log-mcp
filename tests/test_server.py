@@ -74,6 +74,28 @@ def test_dump_activity_log_with_since_filter_and_malformed_date(tmp_path: Path):
     assert data[0]["objective"] == "C"
 
 
+def test_dump_activity_log_with_since_filter_mixed_timezone_entries(tmp_path: Path):
+    log_dir = tmp_path / "activity-log"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_path = log_dir / "activity_log.json"
+    log_path.write_text(
+        json.dumps(
+            [
+                {"date": "2026-05-15T23:59:59", "objective": "A", "result": "A", "changed_files": [], "status": "success", "notes": ""},
+                {"date": "2026-05-16T00:00:00-03:00", "objective": "B", "result": "B", "changed_files": [], "status": "success", "notes": ""},
+                {"date": "2026-05-16T01:00:00Z", "objective": "C", "result": "C", "changed_files": [], "status": "success", "notes": ""},
+            ],
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    dumped = server.dump_activity_log(since="2026-05-16", cwd=str(tmp_path))
+    data = json.loads(dumped)
+
+    assert [entry["objective"] for entry in data] == ["B", "C"]
+
+
 def test_dump_activity_log_validates_since_format(tmp_path: Path):
     result = server.dump_activity_log(since="15-05-2026", cwd=str(tmp_path))
     assert result == "[]"
